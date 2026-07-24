@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: const [
             Icon(Icons.hotel, size: 96, color: Colors.white),
             SizedBox(height: 16),
-            Text('Hotel Manager', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+            Text('Hotel Elite', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text('Manage your hotel with ease', style: TextStyle(color: Colors.white70)),
             SizedBox(height: 32),

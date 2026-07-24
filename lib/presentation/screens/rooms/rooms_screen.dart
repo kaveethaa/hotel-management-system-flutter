@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:hotel_management/presentation/screens/rooms/widgets/room_status_chip.dart';
+
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
+import 'sections/room_filter_chips.dart' hide RoomFilterChips;
+import 'sections/room_search_bar.dart';
+import 'sections/rooms_header.dart';
+import 'sections/rooms_stats_section.dart';
+import 'widgets/room_card.dart';
 
 class RoomsScreen extends ConsumerStatefulWidget {
   const RoomsScreen({super.key});
+
   @override
   ConsumerState<RoomsScreen> createState() => _RoomsScreenState();
 }
@@ -17,74 +24,136 @@ class _RoomsScreenState extends ConsumerState<RoomsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rooms = ref.watch(roomsProvider);
+    final roomsAsync = ref.watch(roomsProvider);
     final isAdmin = ref.watch(authProvider).user?.role == 'Admin';
-    const statuses = ['All', 'Available', 'Occupied', 'Reserved', 'Cleaning', 'Maintenance'];
-    final colors = {
-      'Available': Colors.green, 'Occupied': Colors.orange,
-      'Reserved': Colors.blue, 'Cleaning': Colors.purple, 'Maintenance': Colors.red,
-    };
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Rooms')),
-      floatingActionButton: isAdmin ? FloatingActionButton.extended(
-          onPressed: () => context.push('/rooms/form').then((_) => ref.invalidate(roomsProvider)),
-          icon: const Icon(Icons.add), label: const Text('Add Room')) : null,
-      body: Column(children: [
-        Padding(padding: const EdgeInsets.all(12),
-            child: TextField(
-                onChanged: (v) => setState(() => _search = v.toLowerCase()),
-                decoration: const InputDecoration(hintText: 'Search room number...',
-                    prefixIcon: Icon(Icons.search), border: OutlineInputBorder(),
-                    isDense: true))),
-        SizedBox(height: 56, child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: statuses.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (_, i) {
-              final s = statuses[i]; final sel = _filter == s;
-              return Center(child: ChoiceChip(
-                  label: Text(s), selected: sel,
-                  onSelected: (_) => setState(() => _filter = s)));
-            })),
-        Expanded(child: rooms.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('$e')),
-            data: (list) {
-              final filtered = list.where((r) =>
-              (_filter == 'All' || r.status == _filter) &&
-                  (_search.isEmpty || r.number.toLowerCase().contains(_search))).toList();
-              if (filtered.isEmpty) return const Center(child: Text('No rooms found'));
-              return RefreshIndicator(
-                  onRefresh: () async => ref.invalidate(roomsProvider),
-                  child: ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: filtered.length,
-                      itemBuilder: (_, i) {
-                        final r = filtered[i];
-                        return Card(child: ListTile(
-                          leading: CircleAvatar(backgroundColor: colors[r.status] ?? Colors.grey,
-                              child: Text(r.number.substring(0, 1), style: const TextStyle(color: Colors.white))),
-                          title: Text('Room ${r.number} • ${r.type}'),
-                          subtitle: Text('${NumberFormat.currency(symbol: '\$').format(r.price)}/night • Cap: ${r.capacity}'),
-                          trailing: Chip(label: Text(r.status, style: const TextStyle(fontSize: 11, color: Colors.white)),
-                              backgroundColor: colors[r.status] ?? Colors.grey, visualDensity: VisualDensity.compact),
-                          onTap: isAdmin ? () => context.push('/rooms/form?id=${r.id}').then((_) => ref.invalidate(roomsProvider)) : null,
-                          onLongPress: isAdmin ? () async {
-                            final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
-                                title: const Text('Delete Room?'),
-                                content: Text('Delete Room ${r.number}?'),
-                                actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                                  FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
-                                ]));
-                            if (ok == true) { await deleteRoom(r.id); ref.invalidate(roomsProvider); }
-                          } : null,
-                        ));
-                      }));
-            })),
-      ]),
+      backgroundColor: const Color(0xFFF5F7FA),
+
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF1E88E5),
+        onPressed: () => context
+            .push('/rooms/form')
+            .then((_) => ref.invalidate(roomsProvider)),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Add Room',
+          style: TextStyle(color: Colors.white),
+        ),
+      )
+          : null,
+
+      body: SafeArea(
+        child: Column(
+          children: [
+            const RoomsHeader(),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  RoomSearchBar(
+                    onChanged: (value) {
+                      setState(() => _search = value.toLowerCase());
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  RoomFilterChips(
+                    selected: _filter,
+                    onChanged: (value) {
+                      setState(() => _filter = value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: roomsAsync.when(
+                loading: () =>
+                const Center(child: CircularProgressIndicator()),
+
+                error: (e, _) => Center(child: Text('Error: $e')),
+
+                data: (rooms) {
+                  final filtered = rooms.where((r) {
+                    final matchesFilter =
+                        _filter == 'All' || r.status == _filter;
+
+                    final matchesSearch = _search.isEmpty ||
+                        r.number.toLowerCase().contains(_search) ||
+                        r.type.toLowerCase().contains(_search);
+
+                    return matchesFilter && matchesSearch;
+                  }).toList();
+
+                  return RefreshIndicator(
+                    onRefresh: () async =>
+                        ref.invalidate(roomsProvider),
+
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                      children: [
+                        RoomsStatsSection(rooms: rooms),
+
+                        const SizedBox(height: 20),
+
+                        if (filtered.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 80),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.hotel_outlined,
+                                    size: 64,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    'No rooms found',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          ...filtered.map(
+                                (room) => Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: RoomCard(
+                                room: room,
+                                isAdmin: isAdmin,
+                                onTap: isAdmin
+                                    ? () => context
+                                    .push('/rooms/form?id=${room.id}')
+                                    .then((_) => ref.invalidate(roomsProvider))
+                                    : null,
+                                onDelete: isAdmin
+                                    ? () async {
+                                  await deleteRoom(room.id);
+                                  ref.invalidate(roomsProvider);
+                                }
+                                    : null,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
