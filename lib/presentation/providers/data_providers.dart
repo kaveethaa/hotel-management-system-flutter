@@ -83,6 +83,17 @@ Future<void> cancelReservation(String id, String roomId) async {
   await db.update('rooms', {'status': 'Available'}, where: 'id=?', whereArgs: [roomId]);
 }
 
+Future<void> deleteReservation(String id) async {
+  final db = await DatabaseHelper.instance.database;
+
+  // Get reservation details before deleting
+  final reservation = await db.query(
+    'reservations',
+    where: 'id=?',
+    whereArgs: [id],
+    limit: 1,
+  );
+}
 // BILLS
 final billsProvider = FutureProvider<List<Bill>>((ref) async {
   final db = await DatabaseHelper.instance.database;

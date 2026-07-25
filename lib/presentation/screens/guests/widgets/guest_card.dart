@@ -33,8 +33,8 @@ class GuestCard extends StatelessWidget {
             children: [
               // Avatar
               Container(
-                width: 64,
-                height: 64,
+                width: 55,
+                height: 55,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
@@ -49,14 +49,14 @@ class GuestCard extends StatelessWidget {
                     initial,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
 
               // Guest Info
               Expanded(
@@ -68,8 +68,9 @@ class GuestCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             guest.name,
+                           // maxLines: 1,
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -78,7 +79,7 @@ class GuestCard extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 7),
 
                     Row(
                       children: [

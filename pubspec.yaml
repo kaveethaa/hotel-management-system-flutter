@@ -74,7 +74,7 @@ dev_dependencies:
   flutter_rating_bar: ^4.0.1  # Reviews
   mailer: ^6.1.2              # Email notifications
   uuid: ^4.4.0
-
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

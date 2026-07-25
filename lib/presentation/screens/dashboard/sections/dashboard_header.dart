@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 
 class DashboardHeader extends ConsumerWidget {
@@ -63,7 +64,9 @@ class DashboardHeader extends ConsumerWidget {
               ],
             ),
           ),
-
+          IconButton(
+              icon: Icon(ref.watch(themeModeProvider) == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
+              onPressed: () => ref.read(themeModeProvider.notifier).toggle()),
           IconButton(
             onPressed: () {
               ref.read(authProvider.notifier).logout();

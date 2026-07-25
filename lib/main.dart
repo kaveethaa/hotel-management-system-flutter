@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 import 'data/datasources/local/database_helper.dart';
 import 'seed/dummy_data.dart';
 void main() async {
@@ -24,16 +25,11 @@ class HotelApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
+   // final router = ref.watch(routerProvider);
+    final mode = ref.watch(themeModeProvider);
     return MaterialApp.router(
-      title: 'Hotel Manager',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E88E5),
-        ),
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        useMaterial3: true,
-      ),
+      title: 'Hotel Manager', debugShowCheckedModeBanner: false,
+      theme: AppTheme.light, darkTheme: AppTheme.dark, themeMode: mode,
       routerConfig: router,
     );
   }
