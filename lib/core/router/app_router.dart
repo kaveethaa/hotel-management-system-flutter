@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/screens/analytics/analytics_screen.dart';
 import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/billing/billing_screen.dart';
 import '../../presentation/screens/billing/invoice_screen.dart';
@@ -33,6 +34,8 @@ GoRoute(path: '/reservations/form', builder: (c, s) => ReservationFormScreen(res
 GoRoute(path: '/billing', builder: (_, __) => const BillingScreen()),
 GoRoute(path: '/billing/invoice/:id', builder: (c, s) => InvoiceScreen(billId: s.pathParameters['id']!)),
 GoRoute(path: '/staff', builder: (_, __) => const StaffScreen()),
+  GoRoute(path: '/analytics', builder: (_, __) => const AnalyticsScreen()),
+
 ],
 );
 });

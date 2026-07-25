@@ -47,7 +47,15 @@ class QuickActionsSection extends StatelessWidget {
           color1: const Color(0xFF0F766E),
           color2: const Color(0xFF14B8A6),
           route: '/staff',
-        ),
+        ), _ActionItem(
+        icon: Icons.analytics,
+        label: 'Analytics',
+        color1: const Color(0xFF7C3AED),
+        color2: const Color(0xFF8B5CF6),
+        route: '/analytics',
+      ),
+      //_NavTile(icon: Icons.analytics, label: 'Analytics', onTap: () => context.push('/analytics')),
+
     ];
 
     return Column(

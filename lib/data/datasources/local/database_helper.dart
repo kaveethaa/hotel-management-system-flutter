@@ -1,6 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
+import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite/sqflite.dart';
 class DatabaseHelper {
   DatabaseHelper._();
   static final DatabaseHelper instance = DatabaseHelper._();
@@ -12,11 +15,26 @@ class DatabaseHelper {
   }
 
   Future<Database> _open() async {
-    final path = join(await getDatabasesPath(), 'hotel.db');
-    return openDatabase(path, version: 1, onCreate: _create);
+    String path;
+
+    if (kIsWeb) {
+      // Browser storage (IndexedDB via sqflite_common_ffi_web)
+
+      path = 'hotel.db';
+     // var db = openDatabase(path);
+    } else {
+      path = join(await getDatabasesPath(), 'hotel.db');
+    }
+
+    return openDatabase(
+      path,
+      version: 1,
+      onCreate: _create,
+    );
   }
 
   Future<void> _create(Database db, int v) async {
+    debugPrint("DATABASE CREATED");
     await db.execute('''CREATE TABLE users(
       id TEXT PRIMARY KEY, username TEXT UNIQUE, password TEXT, role TEXT, name TEXT)''');
     await db.execute('''CREATE TABLE staff(

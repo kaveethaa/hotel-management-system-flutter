@@ -1,21 +1,48 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'data/datasources/local/database_helper.dart';
 import 'seed/dummy_data.dart';
-void main() async {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final db = await DatabaseHelper.instance.database;
-  await DummyDataSeeder.seedIfEmpty(db);
+  try {
+    debugPrint("Step 1");
 
-  runApp(const ProviderScope(child: HotelApp()));
+    if (kIsWeb) {
+      databaseFactory = databaseFactoryFfiWeb;
+    }/* else {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }*/
+
+    debugPrint("Step 2");
+
+    final db = await DatabaseHelper.instance.database;
+
+    debugPrint("Step 3");
+
+    await DummyDataSeeder.seedIfEmpty(db);
+
+    debugPrint("Step 4");
+  } catch (e, stack) {
+    debugPrint("ERROR: $e");
+    debugPrintStack(stackTrace: stack);
+  }
+
+  debugPrint("Step 5");
+
+  runApp(
+    const ProviderScope(
+      child: HotelApp(),
+    ),
+  );
 }
 
 class HotelApp extends ConsumerWidget {
@@ -24,12 +51,14 @@ class HotelApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-
-   // final router = ref.watch(routerProvider);
     final mode = ref.watch(themeModeProvider);
+
     return MaterialApp.router(
-      title: 'Hotel Manager', debugShowCheckedModeBanner: false,
-      theme: AppTheme.light, darkTheme: AppTheme.dark, themeMode: mode,
+      debugShowCheckedModeBanner: false,
+      title: 'Hotel Elite',
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: mode,
       routerConfig: router,
     );
   }

@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/services/email_service.dart';
 import '../../../data/datasources/local/database_helper.dart';
 import '../../../data/models/models.dart';
+import '../../../widgets/rating_modal.dart';
 import '../../providers/data_providers.dart';
 
 class ReservationFormScreen extends ConsumerStatefulWidget {
@@ -100,6 +101,9 @@ class _ReservationFormScreenState extends ConsumerState<ReservationFormScreen> {
     await saveReservation(res, isNew: widget.reservationId == null);
     ref.invalidate(reservationsProvider);
     ref.invalidate(roomsProvider);
+    if (_status == 'Checked-Out' && widget.reservationId != null) {
+      if (mounted) await showRatingModal(context, _guestId!, res.id);
+    }
     final guest = ref.read(guestsProvider).value?.firstWhere((g) => g.id == _guestId);
     if (guest != null) {
       EmailService.sendBookingConfirmation(guest: guest, room: room, res: res);
