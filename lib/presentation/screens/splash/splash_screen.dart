@@ -18,9 +18,10 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _init() async {
     await Future.delayed(const Duration(seconds: 2));
     final prefs = await SharedPreferences.getInstance();
-    final seen = prefs.getBool('onboarding_seen') ?? false;
+   final seen = prefs.getBool('onboarding_seen') ?? false;
     if (!mounted) return;
-    context.go(seen ? '/login' : '/onboarding');
+   context.go(seen ? '/login' : '/onboarding');
+    //context.go('/onboarding');
   }
 
   @override

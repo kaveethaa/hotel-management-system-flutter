@@ -243,18 +243,11 @@ class _RoomPreviewCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            color,
-            color.withOpacity(0.75),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.green,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.28),
+            color: Colors.green.withOpacity(0.28),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

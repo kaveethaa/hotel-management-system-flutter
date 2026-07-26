@@ -35,6 +35,7 @@ class RoomFilterChips extends StatelessWidget {
             label: Text(status),
             selected: isSelected,
             selectedColor: const Color(0xFF1E88E5),
+            backgroundColor: Colors.grey.shade200,
             labelStyle: TextStyle(
               color: isSelected ? Colors.white : Colors.black87,
               fontWeight: FontWeight.w600,

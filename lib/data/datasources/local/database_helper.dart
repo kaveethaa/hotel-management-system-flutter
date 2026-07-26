@@ -17,6 +17,7 @@ class DatabaseHelper {
   Future<Database> _open() async {
     String path;
 
+    debugPrint("Opening database...");
     if (kIsWeb) {
       // Browser storage (IndexedDB via sqflite_common_ffi_web)
 
@@ -26,11 +27,14 @@ class DatabaseHelper {
       path = join(await getDatabasesPath(), 'hotel.db');
     }
 
-    return openDatabase(
+    final db = await openDatabase(
       path,
       version: 1,
       onCreate: _create,
     );
+
+    debugPrint("Database opened");
+    return db;
   }
 
   Future<void> _create(Database db, int v) async {
@@ -62,5 +66,7 @@ class DatabaseHelper {
     await db.execute('''CREATE TABLE ratings(
       id TEXT PRIMARY KEY, guest_id TEXT, reservation_id TEXT,
       rating INTEGER, comment TEXT, created_at TEXT)''');
+
+    debugPrint("Tables created");
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'core/router/app_router.dart';
@@ -15,12 +15,10 @@ Future<void> main() async {
   try {
     debugPrint("Step 1");
 
+    // Web only
     if (kIsWeb) {
       databaseFactory = databaseFactoryFfiWeb;
-    }/* else {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    }*/
+    }
 
     debugPrint("Step 2");
 
@@ -44,7 +42,6 @@ Future<void> main() async {
     ),
   );
 }
-
 class HotelApp extends ConsumerWidget {
   const HotelApp({super.key});
 

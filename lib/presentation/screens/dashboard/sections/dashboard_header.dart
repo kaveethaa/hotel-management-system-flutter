@@ -64,9 +64,9 @@ class DashboardHeader extends ConsumerWidget {
               ],
             ),
           ),
-          IconButton(
+         /* IconButton(
               icon: Icon(ref.watch(themeModeProvider) == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
-              onPressed: () => ref.read(themeModeProvider.notifier).toggle()),
+              onPressed: () => ref.read(themeModeProvider.notifier).toggle()),*/
           IconButton(
             onPressed: () {
               ref.read(authProvider.notifier).logout();

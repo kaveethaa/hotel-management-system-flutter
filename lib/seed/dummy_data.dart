@@ -1,16 +1,22 @@
+import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 class DummyDataSeeder {
   static const _uuid = Uuid();
 
   static Future<void> seedIfEmpty(Database db) async {
+    debugPrint("Step 4 seed");
     final c = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM users')) ?? 0;
     if (c > 0) return;
 
     await db.insert('users', {'id': _uuid.v4(), 'username': 'admin', 'password': 'admin123', 'role': 'Admin', 'name': 'Hotel Admin'});
     await db.insert('users', {'id': _uuid.v4(), 'username': 'recep', 'password': 'recep123', 'role': 'Receptionist', 'name': 'Front Desk'});
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM users'),
+    );
 
+    debugPrint("Users count = $count");
     final rooms = [
       {'number': '101', 'type': 'Standard', 'price': 80.0, 'capacity': 2},
       {'number': '102', 'type': 'Standard', 'price': 80.0, 'capacity': 2},
@@ -76,5 +82,13 @@ class DummyDataSeeder {
     for (final s in staff) {
       await db.insert('staff', {'id': _uuid.v4(), ...s});
     }
+    final count1 = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM staff'),
+    );
+
+    debugPrint("Users count = $count1");
+    Fluttertoast.showToast(
+      msg: "Users count = $count1",
+    );
   }
 }
